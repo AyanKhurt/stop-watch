@@ -1,37 +1,48 @@
-let startTime, intervalId;
-let elapsedTime = 0;
-let running = false;
-
-let display = document.getElementById('display');
+let hours = 0;
+let minutes = 0;
+let seconds = 0;
+let timerInterval;
+let isRunning = false;
 
 function updateDisplay() {
-    let totalMilliseconds = Date.now() - startTime + elapsedTime;
-    let totalSeconds = Math.floor(totalMilliseconds / 1000);
-    let hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
-    let minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
-    let seconds = String(totalSeconds % 60).padStart(2, '0');
-    display.textContent = `${hours}:${minutes}:${seconds}`;
+let display = document.getElementById("display");
+    display.innerText =
+        (hours < 10 ? "0" : "") + hours + ":" +
+        (minutes < 10 ? "0" : "") + minutes + ":" +
+        (seconds < 10 ? "0" : "") + seconds;
 }
 
 function startStopwatch() {
-    if (!running) {
-        startTime = Date.now();
-        intervalId = setInterval(updateDisplay, 1000);
-        running = true;
+    if (!isRunning) {
+        timerInterval = setInterval(() => {
+            seconds++;
+            if (seconds === 60) {
+                seconds = 0;
+                minutes++;
+            }
+            if (minutes === 60) {
+                minutes = 0;
+                hours++;
+            }
+            updateDisplay();
+        }, 1000);
+        isRunning = true;
+        document.getElementById("startBtn").disabled = true;
     }
 }
 
 function stopStopwatch() {
-    if (running) {
-        clearInterval(intervalId);
-        elapsedTime += Date.now() - startTime;
-        running = false;
-    }
+    clearInterval(timerInterval);
+    isRunning = false;
+    document.getElementById("startBtn").disabled = false;
 }
 
 function resetStopwatch() {
-    clearInterval(intervalId);
-    elapsedTime = 0;
-    running = false;
-    display.textContent = '00:00:00';
+    clearInterval(timerInterval);
+    hours = 0;
+    minutes = 0;
+    seconds = 0;
+    isRunning = false;
+    updateDisplay();
+    document.getElementById("startBtn").disabled = false;
 }
